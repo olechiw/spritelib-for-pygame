@@ -4,8 +4,7 @@
 #You can change this on lines 66, 139, 236 etc. (in the __init__ functions)
 #**************************************
 #Usage:
-#ignore: sprite_base
-#To use this library simply set your variable like this:
+#ignore sprite_base!!! ignore sprite_base!!! ignore sprite_base!!! ignore sprite_base!!! (its just your basic sprite class in pygame)
 #    from pygame import spritelibs
 #    self.my_sprite = spritelibs.updown('foo.image', (x, y))
 #    self.my_sprite.group.draw()
@@ -31,7 +30,7 @@ class sprite_base(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.left, self.rect.top = location
             self.image = pygame.transform.scale(self.image, size)
-            self.pos = location
+            self.absolute_pos = location
 class updown():
     def move_down(self, sprite, group, groups, surface):
             sprite2 = sprite_base(sprite.image_name, (sprite.absolute_pos[0], sprite.absolute_pos[1]+20), ((20, 20)))
@@ -201,7 +200,7 @@ class leftright():
                 for x in collide_sprite:
                     collided = True
             if not collided:
-                groups.remove(sprite)
+                group.remove(sprite)
                 del groups[groups.index(group)]
                 pygame.draw.rect(surface, [0, 0, 0], [sprite.absolute_pos[0], sprite.absolute_pos[1], 20, 20], 0)
                 groups.append(sprite2s)
@@ -237,7 +236,7 @@ class leftright():
                 for x in collide_sprite:
                     collided = True
             if not collided:
-                groups.remove(sprite)
+                group.remove(sprite)
                 del groups[groups.index(group)]
                 pygame.draw.rect(surface, [0, 0, 0], [sprite.absolute_pos[0], sprite.absolute_pos[1], 20, 20], 0)
                 groups.append(sprite2s)
@@ -298,7 +297,7 @@ class rightleft():
                 for x in collide_sprite:
                     collided = True
             if not collided:
-                groups.remove(sprite)
+                group.remove(sprite)
                 del groups[groups.index(group)]
                 pygame.draw.rect(surface, [0, 0, 0], [sprite.absolute_pos[0], sprite.absolute_pos[1], 20, 20], 0)
                 groups.append(sprite2s)
@@ -334,7 +333,7 @@ class rightleft():
                 for x in collide_sprite:
                     collided = True
             if not collided:
-                groups.remove(sprite)
+                group.remove(sprite)
                 del groups[groups.index(group)]
                 pygame.draw.rect(surface, [0, 0, 0], [sprite.absolute_pos[0], sprite.absolute_pos[1], 20, 20], 0)
                 groups.append(sprite2s)
@@ -497,13 +496,33 @@ class static_base():
         self.sprite = sprite_base(image, location, ((20, 20)))
         self.group = pygame.sprite.Group(self.sprite)
         self.default = False
-    def updatefunc(self, foo1, foo2):
-        pass
-    def right(self):
-        pass
-    def left(self):
-        pass
-    def up(self):
-        pass
-    def down(self):
-        pass
+    def updatefunc(self, surface, groups):
+        return [surface, groups]
+    def right(self, surface, groups):
+        returned = self.move_right(self.sprite, self.group, groups, surface)
+        self.sprite = returned[0]
+        self.group = returned[1]
+        groups = returned[3]
+        surface = returned[4]
+        return [surface, groups]
+    def left(self, groups, surface):
+        returned = self.move_left(self.sprite, self.group, groups, surface)
+        self.sprite = returned[0]
+        self.group = returned[1]
+        groups = returned[3]
+        surface = returned[4]
+        return [surface, groups]
+    def up(self, groups, surface):
+        returned = self.move_up(self.sprite, self.group, groups, surface)
+        self.sprite = returned[0]
+        self.group = returned[1]
+        groups = returned[3]
+        surface = returned[4]
+        return [surface, groups]
+    def down(self, groups, surface):
+        returned = self.move_down(self.sprite, self.group, groups, surface)
+        self.sprite = returned[0]
+        self.group = returned[1]
+        groups = returned[3]
+        surface = returned[4]
+        return [surface, groups]
